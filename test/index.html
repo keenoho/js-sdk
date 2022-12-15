@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="http://static.keenoho.space/lib/axios.min.js"></script>
+    <script src="http://static.keenoho.space/lib/crypto-js.min.js"></script>
+    <script src="http://static.keenoho.space/lib/uuid.min.js"></script>
+    <script src="http://static.keenoho.space/lib/md5.min.js"></script>
+    <script src="../dist/keenoho-sdk.js"></script>
+  </head>
+
+  <body>
+    <h1>Result</h1>
+    <p>signature:</p>
+    <input type="text" disabled id="sig" placeholder="" />
+    <p>user info:</p>
+    <input id="usr" disabled placeholder="" />
+
+    <hr />
+
+    <h1>Signature</h1>
+    <p>simple actions:</p>
+    <button onclick="handleClear()">clear</button>
+    <button onclick="handleGetSignature()">get signature</button>
+    <button onclick="handleCheckSignature()">check signature</button>
+    <button onclick="handleRefreshSignature()">refresh signature</button>
+    <button onclick="handleAuthSignature()">auth signature</button>
+    <br />
+    <p>complex actions:</p>
+    <button onclick="handleInitSignature()">init signature</button>
+
+    <hr />
+
+    <h1>User</h1>
+    <p>login</p>
+    <input type="text" id="account" placeholder="account" value="test" />
+    <input type="text" id="password" placeholder="password" value="1234" />
+    <button onclick="handleUserLogin()">login</button>
+    <p>info</p>
+    <button onclick="handleUserInfo()">user info</button>
+    <button onclick="handleUserRole()">user role</button>
+    <button onclick="handleUserPermission()">user permission</button>
+
+    <script>
+      console.log(Keenoho);
+      const sigEle = document.getElementById('sig');
+      const usrEle = document.getElementById('usr');
+      const accountEle = document.getElementById('account');
+      const passwordEle = document.getElementById('password');
+
+      const app = 1111111111111111;
+      const secretkey = '80C6AACE81CA46B25632EADEC94AF6B3';
+
+      let signature = '';
+      const getSignatureFunc = () => signature;
+      const setSignatureFunc = (val) => {
+        signature = val;
+        sigEle.value = val;
+      };
+      const getAppFunc = () => app;
+      const goToLoginFunc = () => alert('go to login');
+      const showErrorFunc = (msg) => alert(msg);
+
+      let request = Keenoho.request.createRequestInstance({
+        baseURL: 'http://127.0.0.1:8000',
+        baseURL: 'http://api.keenoho.space',
+        getSignatureFunc,
+        setSignatureFunc,
+        goToLoginFunc,
+        getAppFunc,
+        showErrorFunc,
+      });
+
+      console.log(request);
+
+      function handleClear() {
+        setSignatureFunc('');
+      }
+      function handleInitSignature() {
+        Keenoho.signature.initSignature({ app, secretkey, getSignatureFunc, setSignatureFunc }).then((res) => {
+          console.log(res);
+        });
+      }
+      function handleGetSignature() {
+        Keenoho.signature.getSignature({ app, secretkey }).then((res) => {
+          console.log(res);
+          setSignatureFunc(res.data);
+        });
+      }
+      function handleCheckSignature() {
+        Keenoho.signature.checkSignature().then((res) => {
+          console.log(res);
+        });
+      }
+      function handleRefreshSignature() {
+        Keenoho.signature.refreshSignature().then((res) => {
+          console.log(res);
+          setSignatureFunc(res.data);
+        });
+      }
+      function handleAuthSignature() {
+        Keenoho.signature
+          .authSignature({
+            type: 'login.account',
+            account: 'test',
+            password: '81dc9bdb52d04dc20036dbd8313ed055',
+          })
+          .then((res) => {
+            console.log(res);
+            setSignatureFunc(res.data.signature);
+          });
+      }
+      function handleUserLogin() {
+        const account = accountEle.value;
+        const password = passwordEle.value;
+        Keenoho.user
+          .login({
+            type: 'login.account',
+            account: 'test',
+            password: MD5(password),
+          })
+          .then((res) => {
+            console.log(res);
+            setSignatureFunc(res.data.signature);
+            usrEle.value = JSON.stringify(res.data.user);
+          });
+      }
+      function handleUserInfo() {
+        Keenoho.user.getUserInfo().then((res) => {
+          console.log(res);
+          usrEle.value = JSON.stringify(res.data);
+        });
+      }
+      function handleUserRole() {
+        Keenoho.user.getUserRole().then((res) => {
+          console.log(res);
+          usrEle.value = JSON.stringify(res.data);
+        });
+      }
+      function handleUserPermission() {
+        Keenoho.user.getUserPermission().then((res) => {
+          console.log(res);
+          usrEle.value = JSON.stringify(res.data);
+        });
+      }
+    </script>
+  </body>
+</html>

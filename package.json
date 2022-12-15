@@ -1,6 +1,6 @@
 {
 	"name": "@keenoho/sdk",
-	"version": "0.0.4",
+	"version": "1.0.0",
 	"description": "keenoho sdk",
 	"main": "./index.js",
 	"scripts": {

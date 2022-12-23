@@ -3354,7 +3354,7 @@
     if (showError && typeof this.handleMap.showErrorFunc === 'function') {
       this.handleMap.showErrorFunc(msg);
     }
-    if (code >= -1 && code < 30000 && code != 20005) {
+    if (code >= 20000 && code < 30000 && code != 20005) {
       if (typeof this.handleMap.setSignatureFunc === 'function') {
         this.handleMap.setSignatureFunc(null);
       }

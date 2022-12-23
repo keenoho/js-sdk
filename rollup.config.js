@@ -101,6 +101,29 @@ export default () => {
         },
       ],
     }),
+    // browser minify: umd + ems + cjs
+    buildConfig({
+      isBrowser: true,
+      isEs5: true,
+      isMinify: true,
+      output: [
+        {
+          entryFileNames: '[name].umd.min.js',
+          format: 'umd',
+          exports: 'default',
+        },
+        {
+          entryFileNames: '[name].esm.min.js',
+          format: 'esm',
+          exports: 'named',
+        },
+        {
+          entryFileNames: '[name].cjs.min.js',
+          format: 'cjs',
+          exports: 'default',
+        },
+      ],
+    }),
     // browser external: umd + ems + cjs
     buildConfig({
       isBrowser: true,

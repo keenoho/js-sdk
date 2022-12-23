@@ -5,11 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="http://static.keenoho.space/lib/axios.min.js"></script>
-    <script src="http://static.keenoho.space/lib/crypto-js.min.js"></script>
-    <script src="http://static.keenoho.space/lib/uuid.min.js"></script>
-    <script src="http://static.keenoho.space/lib/md5.min.js"></script>
-    <script src="../dist/keenoho-sdk.js"></script>
+    <script src="../dist/browser/sdk.umd.js"></script>
   </head>
 
   <body>
@@ -66,7 +62,7 @@
 
       let request = Keenoho.request.createRequestInstance({
         baseURL: 'http://127.0.0.1:8000',
-        baseURL: 'http://api.keenoho.space',
+        // baseURL: 'http://api.keenoho.space',
         getSignatureFunc,
         setSignatureFunc,
         goToLoginFunc,

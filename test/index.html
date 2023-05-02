@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script></script>
+    <script src="../dist/browser/keenoho.umd.js"></script>
+  </head>
+  <body>
+    <script>
+      window.onload = () => {
+        console.log(window.Keenoho);
+
+        Keenoho.config.loadConfig()
+        Keenoho.config.setConfig({
+          app: '2201001547533701',
+          publicKey: 'EF534ECD9A7C69DF3D9D1B8DA2F9175D4A525FB2F9A98DDD66C39CC87ED4ED779082FC4DC23EB52DE85F5BB5E6954014',
+          apiHost: 'http://localhost:8000',
+        });
+
+        console.log(window.Keenoho.config.getConfig());
+
+        window.Keenoho.signature.sign().then(() => {
+          console.log(window.Keenoho.config.getConfig());
+        });
+
+        // const sdk = new Keenoho.SDK();
+      };
+    </script>
+  </body>
+</html>

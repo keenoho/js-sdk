@@ -550,9 +550,27 @@
     apiHost: undefined,
     ttl: 3200
   };
-  function loadBrowserConfig() {}
+  function loadBrowserConfig() {
+    var app = window.APP || undefined;
+    var env = window.ENV || undefined;
+    var mode = window.MODE || undefined;
+    var publicKey = window.APP_PUBLIC_KEY || undefined;
+    var ttl = window.SIGNATURE_TTL || 3200;
+    var apiHost = window.SYSTEMCE_HOST || (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
+    setConfig({
+      app: app,
+      env: env,
+      mode: mode,
+      publicKey: publicKey,
+      ttl: ttl,
+      apiHost: apiHost
+    });
+  }
   function loadNodeConfig() {}
   function loadConfig() {
+    if (judgePlatform() === PLATFORM_BROWSER) {
+      loadBrowserConfig();
+    }
   }
   function getConfig(key) {
     if (key in storeConfig) {
@@ -10015,7 +10033,8 @@
     v1: {
       SignatureSign: '/v1/signature/sign',
       SignatureCheck: '/v1/signature/check',
-      SignatureRefresh: '/v1/signature/refresh'
+      SignatureRefresh: '/v1/signature/refresh',
+      SignatureData: '/v1/signature/data'
     }
   };
   function computeSign(app, ts, ttl, uid, publicKey) {
@@ -10117,12 +10136,37 @@
     }));
     return _refresh.apply(this, arguments);
   }
+  function data() {
+    return _data.apply(this, arguments);
+  }
+  function _data() {
+    _data = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+      return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+        while (1) switch (_context4.prev = _context4.next) {
+          case 0:
+            checkConfig();
+            _context4.next = 3;
+            return get({
+              url: apiMap.v1.SignatureData,
+              params: {}
+            });
+          case 3:
+            return _context4.abrupt("return", _context4.sent);
+          case 4:
+          case "end":
+            return _context4.stop();
+        }
+      }, _callee4);
+    }));
+    return _data.apply(this, arguments);
+  }
 
   var signature = /*#__PURE__*/Object.freeze({
     __proto__: null,
     check: check,
     computeSession: computeSession,
     computeSign: computeSign,
+    data: data,
     refresh: refresh,
     sign: sign
   });
@@ -10193,6 +10237,7 @@
     }, {
       key: "initConfig",
       value: function initConfig() {
+        loadConfig();
         var storeApp = localStorage.getItem(storeKeyMap.app);
         var storePublicKey = localStorage.getItem(storeKeyMap.publicKey);
         this.config = Object.assign({}, getConfig());

@@ -8,6 +8,7 @@ const apiMap = {
     SignatureSign: '/v1/signature/sign',
     SignatureCheck: '/v1/signature/check',
     SignatureRefresh: '/v1/signature/refresh',
+    SignatureData: '/v1/signature/data',
   },
 };
 
@@ -62,6 +63,14 @@ export async function refresh() {
   checkConfig();
   return await get({
     url: apiMap.v1.SignatureRefresh,
+    params: {},
+  });
+}
+
+export async function data() {
+  checkConfig();
+  return await get({
+    url: apiMap.v1.SignatureData,
     params: {},
   });
 }

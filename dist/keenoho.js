@@ -22,11 +22,31 @@ const storeConfig = {
   ttl: 3200,
 };
 
-function loadBrowserConfig() {}
+function loadBrowserConfig() {
+  const app = window.APP || undefined;
+  const env = window.ENV || undefined;
+  const mode = window.MODE || undefined;
+  const publicKey = window.APP_PUBLIC_KEY || undefined;
+  const ttl = window.SIGNATURE_TTL || 3200;
+  const apiHost =
+    window.SYSTEMCE_HOST ||
+    (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
+  setConfig({
+    app,
+    env,
+    mode,
+    publicKey,
+    ttl,
+    apiHost,
+  });
+}
 
 function loadNodeConfig() {}
 
 function loadConfig() {
+  if (judgePlatform() === PLATFORM_BROWSER) {
+    loadBrowserConfig();
+  }
 }
 
 function getConfig(key) {
@@ -185,6 +205,7 @@ const apiMap = {
     SignatureSign: '/v1/signature/sign',
     SignatureCheck: '/v1/signature/check',
     SignatureRefresh: '/v1/signature/refresh',
+    SignatureData: '/v1/signature/data',
   },
 };
 
@@ -243,11 +264,20 @@ async function refresh() {
   });
 }
 
+async function data() {
+  checkConfig();
+  return await get({
+    url: apiMap.v1.SignatureData,
+    params: {},
+  });
+}
+
 var signature = /*#__PURE__*/Object.freeze({
   __proto__: null,
   check: check,
   computeSession: computeSession,
   computeSign: computeSign,
+  data: data,
   refresh: refresh,
   sign: sign
 });
@@ -295,6 +325,7 @@ class SDK extends (EventEmitter) {
   }
 
   initConfig() {
+    loadConfig();
     const storeApp = localStorage.getItem(storeKeyMap.app);
     const storePublicKey = localStorage.getItem(storeKeyMap.publicKey);
     this.config = Object.assign({}, getConfig());

@@ -8,7 +8,8 @@
 		"build": "rollup -c ./rollup.config.js --bundleConfigAsCjs",
 		"beforePublish": "node ./build/publish.js && npm run fmt && npm run build",
 		"fmt": "prettier -w ./src/**/*.*",
-		"publish": "npm publish --access public"
+		"publish": "npm publish --access public",
+    "server": "http-server -p 8080 --cors=* -o -c-1"
 	},
 	"repository": {
 		"type": "git",

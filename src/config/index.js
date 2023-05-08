@@ -12,9 +12,24 @@ const storeConfig = {
   ttl: 3200,
 };
 
-const envConfigKeyMap = {};
-
-export function loadBrowserConfig() {}
+export function loadBrowserConfig() {
+  const app = window.APP || undefined;
+  const env = window.ENV || undefined;
+  const mode = window.MODE || undefined;
+  const publicKey = window.APP_PUBLIC_KEY || undefined;
+  const ttl = window.SIGNATURE_TTL || 3200;
+  const apiHost =
+    window.SYSTEMCE_HOST ||
+    (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
+  setConfig({
+    app,
+    env,
+    mode,
+    publicKey,
+    ttl,
+    apiHost,
+  });
+}
 
 export function loadNodeConfig() {}
 

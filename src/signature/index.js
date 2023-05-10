@@ -2,15 +2,7 @@ import CryptoJS from 'crypto-js';
 import { v4 as uuid } from 'uuid';
 import { getConfig, checkConfig, setConfig } from '../config';
 import { get } from '../util/request';
-
-const apiMap = {
-  v1: {
-    SignatureSign: '/v1/signature/sign',
-    SignatureCheck: '/v1/signature/check',
-    SignatureRefresh: '/v1/signature/refresh',
-    SignatureData: '/v1/signature/data',
-  },
-};
+import { apiMap } from '../constant';
 
 export function computeSign(app, ts, ttl, uid, publicKey) {
   const str = `${app}${ts}${ttl}${uid}`.split('').sort().join('');

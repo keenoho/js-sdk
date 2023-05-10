@@ -28,7 +28,6 @@ const buildConfig = ({
   isBrowser = false,
   isMinify = false,
   isEs5 = false,
-  isSdk = false,
   output = {},
   plugins = [],
 }) => {

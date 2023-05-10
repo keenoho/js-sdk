@@ -1,7 +1,8 @@
 import { getConfig, loadConfig, setConfig } from './config';
 import Logger from './util/logger';
 import EventEmitter from './util/eventEmitter';
-import { sign, check, refresh } from './signature';
+import { sign, check, refresh, data } from './signature';
+import { login, info } from './user';
 import { request } from './util/request';
 
 const storeKeyMap = {
@@ -12,6 +13,8 @@ const storeKeyMap = {
 
 export default class SDK extends (Logger, EventEmitter) {
   config = {};
+  user = {};
+
   constructor() {
     super();
     this.initConfig();
@@ -54,8 +57,10 @@ export default class SDK extends (Logger, EventEmitter) {
         .then(() => {
           return true;
         })
-        .catch(() => {
+        .catch((err) => {
           setConfig('signature', undefined);
+          localStorage.removeItem(storeKeyMap.signature);
+          this.emit('error', err);
           return false;
         });
 
@@ -64,11 +69,14 @@ export default class SDK extends (Logger, EventEmitter) {
           .then(() => {
             return true;
           })
-          .catch(() => {
+          .catch((err) => {
             setConfig('signature', undefined);
+            localStorage.removeItem(storeKeyMap.signature);
+            this.emit('error', err);
             return false;
           });
         if (refreshRes) {
+          this.emit('ready');
           return;
         }
       }
@@ -82,10 +90,12 @@ export default class SDK extends (Logger, EventEmitter) {
       })
       .then((res) => {
         localStorage.setItem(storeKeyMap.signature, res);
+        this.emit('ready');
       })
       .catch((err) => {
         setConfig('signature', undefined);
-        return err;
+        localStorage.removeItem(storeKeyMap.signature);
+        this.emit('error', err);
       });
   }
 
@@ -95,5 +105,22 @@ export default class SDK extends (Logger, EventEmitter) {
 
   sendRequest(axiosOptions, requestOptions) {
     return request(axiosOptions, requestOptions);
+  }
+
+  login(options) {
+    return login(options).then((res) => {
+      if (res && res.code === 0) {
+        this.user = res.data;
+      }
+      return res;
+    });
+  }
+
+  info(options) {
+    return info(options);
+  }
+
+  data() {
+    return data();
   }
 }

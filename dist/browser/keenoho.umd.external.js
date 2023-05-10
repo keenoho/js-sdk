@@ -486,6 +486,16 @@
 
   var PLATFORM_NODE = 'node';
   var PLATFORM_BROWSER = 'browser';
+  var apiMap = {
+    v1: {
+      SignatureSign: '/v1/signature/sign',
+      SignatureCheck: '/v1/signature/check',
+      SignatureRefresh: '/v1/signature/refresh',
+      SignatureData: '/v1/signature/data',
+      UserLogin: '/v1/user/login',
+      UserInfo: '/v1/user/info'
+    }
+  };
 
   function judgePlatform() {
     return typeof document === 'undefined' ? PLATFORM_NODE : PLATFORM_BROWSER;
@@ -532,10 +542,10 @@
   function setConfig(key, value) {
     if (arguments.length == 1 && _typeof(arguments[0]) === 'object') {
       for (var k in arguments[0]) {
-        storeConfig[k] = arguments[0][k];
+        storeConfig[k] = arguments[0][k] || storeConfig[k];
       }
     } else if (arguments.length == 2) {
-      storeConfig[key] = value;
+      storeConfig[key] = value || storeConfig[key];
     }
   }
   function checkConfig() {
@@ -670,14 +680,6 @@
     request: request
   });
 
-  var apiMap = {
-    v1: {
-      SignatureSign: '/v1/signature/sign',
-      SignatureCheck: '/v1/signature/check',
-      SignatureRefresh: '/v1/signature/refresh',
-      SignatureData: '/v1/signature/data'
-    }
-  };
   function computeSign(app, ts, ttl, uid, publicKey) {
     var str = "".concat(app).concat(ts).concat(ttl).concat(uid).split('').sort().join('');
     return CryptoJS.HmacSHA1(str, publicKey);
@@ -812,6 +814,35 @@
     sign: sign
   });
 
+  function login(options) {
+    checkConfig();
+    var _getConfig = getConfig(),
+      app = _getConfig.app;
+    return post({
+      url: apiMap.v1.UserLogin,
+      data: _objectSpread2({
+        app: app
+      }, options)
+    });
+  }
+  function info(options) {
+    checkConfig();
+    var _getConfig2 = getConfig(),
+      app = _getConfig2.app;
+    return get({
+      url: apiMap.v1.UserInfo,
+      params: _objectSpread2({
+        app: app
+      }, options)
+    });
+  }
+
+  var user = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    info: info,
+    login: login
+  });
+
   var EventEmitter = /*#__PURE__*/function () {
     function EventEmitter() {
       _classCallCheck(this, EventEmitter);
@@ -855,6 +886,7 @@
       _classCallCheck(this, SDK);
       _this = _super.call(this);
       _defineProperty(_assertThisInitialized(_this), "config", {});
+      _defineProperty(_assertThisInitialized(_this), "user", {});
       _this.initConfig();
       _this.initSignature();
       return _this;
@@ -895,45 +927,51 @@
       key: "initSignature",
       value: function () {
         var _initSignature = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+          var _this2 = this;
           var storeSignature, checkRes, refreshRes;
           return _regeneratorRuntime().wrap(function _callee$(_context) {
             while (1) switch (_context.prev = _context.next) {
               case 0:
                 storeSignature = localStorage.getItem(storeKeyMap.signature);
                 if (!storeSignature) {
-                  _context.next = 12;
+                  _context.next = 13;
                   break;
                 }
                 setConfig('signature', storeSignature);
                 _context.next = 5;
                 return check().then(function () {
                   return true;
-                })["catch"](function () {
+                })["catch"](function (err) {
                   setConfig('signature', undefined);
+                  localStorage.removeItem(storeKeyMap.signature);
+                  _this2.emit('error', err);
                   return false;
                 });
               case 5:
                 checkRes = _context.sent;
                 if (!checkRes) {
-                  _context.next = 12;
+                  _context.next = 13;
                   break;
                 }
                 _context.next = 9;
                 return refresh().then(function () {
                   return true;
-                })["catch"](function () {
+                })["catch"](function (err) {
                   setConfig('signature', undefined);
+                  localStorage.removeItem(storeKeyMap.signature);
+                  _this2.emit('error', err);
                   return false;
                 });
               case 9:
                 refreshRes = _context.sent;
                 if (!refreshRes) {
-                  _context.next = 12;
+                  _context.next = 13;
                   break;
                 }
+                this.emit('ready');
                 return _context.abrupt("return");
-              case 12:
-                _context.next = 14;
+              case 13:
+                _context.next = 15;
                 return sign().then(function (res) {
                   if (res && res.code == 0 && res.data) {
                     return res.data;
@@ -941,15 +979,17 @@
                   throw res;
                 }).then(function (res) {
                   localStorage.setItem(storeKeyMap.signature, res);
+                  _this2.emit('ready');
                 })["catch"](function (err) {
                   setConfig('signature', undefined);
-                  return err;
+                  localStorage.removeItem(storeKeyMap.signature);
+                  _this2.emit('error', err);
                 });
-              case 14:
+              case 15:
               case "end":
                 return _context.stop();
             }
-          }, _callee);
+          }, _callee, this);
         }));
         function initSignature() {
           return _initSignature.apply(this, arguments);
@@ -966,6 +1006,27 @@
       value: function sendRequest(axiosOptions, requestOptions) {
         return request(axiosOptions, requestOptions);
       }
+    }, {
+      key: "login",
+      value: function login$1(options) {
+        var _this3 = this;
+        return login(options).then(function (res) {
+          if (res && res.code === 0) {
+            _this3.user = res.data;
+          }
+          return res;
+        });
+      }
+    }, {
+      key: "info",
+      value: function info$1(options) {
+        return info(options);
+      }
+    }, {
+      key: "data",
+      value: function data$1() {
+        return data();
+      }
     }]);
     return SDK;
   }((EventEmitter));
@@ -973,6 +1034,7 @@
   var index = {
     config: config,
     signature: signature,
+    user: user,
     request: request$1,
     SDK: SDK
   };

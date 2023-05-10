@@ -51,10 +51,10 @@ export function getConfig(key) {
 export function setConfig(key, value) {
   if (arguments.length == 1 && typeof arguments[0] === 'object') {
     for (let k in arguments[0]) {
-      storeConfig[k] = arguments[0][k];
+      storeConfig[k] = arguments[0][k] || storeConfig[k];
     }
   } else if (arguments.length == 2) {
-    storeConfig[key] = value;
+    storeConfig[key] = value || storeConfig[key];
   }
 }
 

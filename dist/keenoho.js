@@ -6,6 +6,16 @@ var axios = require('axios');
 
 const PLATFORM_NODE = 'node';
 const PLATFORM_BROWSER = 'browser';
+const apiMap = {
+  v1: {
+    SignatureSign: '/v1/signature/sign',
+    SignatureCheck: '/v1/signature/check',
+    SignatureRefresh: '/v1/signature/refresh',
+    SignatureData: '/v1/signature/data',
+    UserLogin: '/v1/user/login',
+    UserInfo: '/v1/user/info',
+  },
+};
 
 function judgePlatform() {
   return typeof document === 'undefined' ? PLATFORM_NODE : PLATFORM_BROWSER;
@@ -59,10 +69,10 @@ function getConfig(key) {
 function setConfig(key, value) {
   if (arguments.length == 1 && typeof arguments[0] === 'object') {
     for (let k in arguments[0]) {
-      storeConfig[k] = arguments[0][k];
+      storeConfig[k] = arguments[0][k] || storeConfig[k];
     }
   } else if (arguments.length == 2) {
-    storeConfig[key] = value;
+    storeConfig[key] = value || storeConfig[key];
   }
 }
 
@@ -200,15 +210,6 @@ var request$1 = /*#__PURE__*/Object.freeze({
   request: request
 });
 
-const apiMap = {
-  v1: {
-    SignatureSign: '/v1/signature/sign',
-    SignatureCheck: '/v1/signature/check',
-    SignatureRefresh: '/v1/signature/refresh',
-    SignatureData: '/v1/signature/data',
-  },
-};
-
 function computeSign(app, ts, ttl, uid, publicKey) {
   const str = `${app}${ts}${ttl}${uid}`.split('').sort().join('');
   return CryptoJS.HmacSHA1(str, publicKey);
@@ -282,6 +283,36 @@ var signature = /*#__PURE__*/Object.freeze({
   sign: sign
 });
 
+function login(options) {
+  checkConfig();
+  const { app } = getConfig();
+  return post({
+    url: apiMap.v1.UserLogin,
+    data: {
+      app,
+      ...options,
+    },
+  });
+}
+
+function info(options) {
+  checkConfig();
+  const { app } = getConfig();
+  return get({
+    url: apiMap.v1.UserInfo,
+    params: {
+      app,
+      ...options,
+    },
+  });
+}
+
+var user = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  info: info,
+  login: login
+});
+
 class EventEmitter {
   callbacks = {};
   addEventListener(type, callback) {
@@ -305,6 +336,8 @@ const storeKeyMap = {
 
 class SDK extends (EventEmitter) {
   config = {};
+  user = {};
+
   constructor() {
     super();
     this.initConfig();
@@ -347,8 +380,10 @@ class SDK extends (EventEmitter) {
         .then(() => {
           return true;
         })
-        .catch(() => {
+        .catch((err) => {
           setConfig('signature', undefined);
+          localStorage.removeItem(storeKeyMap.signature);
+          this.emit('error', err);
           return false;
         });
 
@@ -357,11 +392,14 @@ class SDK extends (EventEmitter) {
           .then(() => {
             return true;
           })
-          .catch(() => {
+          .catch((err) => {
             setConfig('signature', undefined);
+            localStorage.removeItem(storeKeyMap.signature);
+            this.emit('error', err);
             return false;
           });
         if (refreshRes) {
+          this.emit('ready');
           return;
         }
       }
@@ -375,10 +413,12 @@ class SDK extends (EventEmitter) {
       })
       .then((res) => {
         localStorage.setItem(storeKeyMap.signature, res);
+        this.emit('ready');
       })
       .catch((err) => {
         setConfig('signature', undefined);
-        return err;
+        localStorage.removeItem(storeKeyMap.signature);
+        this.emit('error', err);
       });
   }
 
@@ -389,11 +429,29 @@ class SDK extends (EventEmitter) {
   sendRequest(axiosOptions, requestOptions) {
     return request(axiosOptions, requestOptions);
   }
+
+  login(options) {
+    return login(options).then((res) => {
+      if (res && res.code === 0) {
+        this.user = res.data;
+      }
+      return res;
+    });
+  }
+
+  info(options) {
+    return info(options);
+  }
+
+  data() {
+    return data();
+  }
 }
 
 var index = {
   config,
   signature,
+  user,
   request: request$1,
   SDK,
 };

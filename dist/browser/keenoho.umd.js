@@ -561,12 +561,12 @@
     ttl: 3200
   };
   function loadBrowserConfig() {
-    var app = window.APP || undefined;
-    var env = window.ENV || undefined;
-    var mode = window.MODE || undefined;
-    var publicKey = window.APP_PUBLIC_KEY || undefined;
-    var ttl = window.SIGNATURE_TTL || 3200;
-    var apiHost = window.SYSTEMCE_HOST || (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
+    var app = storeConfig.app || window.APP || undefined;
+    var env = storeConfig.env || window.ENV || undefined;
+    var mode = storeConfig.mode || window.MODE || undefined;
+    var publicKey = storeConfig.publicKey || window.APP_PUBLIC_KEY || undefined;
+    var ttl = storeConfig.ttl || window.SIGNATURE_TTL || 3200;
+    var apiHost = storeConfig.apiHost || window.SYSTEMCE_HOST || (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
     setConfig({
       app: app,
       env: env,

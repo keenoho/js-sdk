@@ -33,12 +33,13 @@ const storeConfig = {
 };
 
 function loadBrowserConfig() {
-  const app = window.APP || undefined;
-  const env = window.ENV || undefined;
-  const mode = window.MODE || undefined;
-  const publicKey = window.APP_PUBLIC_KEY || undefined;
-  const ttl = window.SIGNATURE_TTL || 3200;
+  const app = storeConfig.app || window.APP || undefined;
+  const env = storeConfig.env || window.ENV || undefined;
+  const mode = storeConfig.mode || window.MODE || undefined;
+  const publicKey = storeConfig.publicKey || window.APP_PUBLIC_KEY || undefined;
+  const ttl = storeConfig.ttl || window.SIGNATURE_TTL || 3200;
   const apiHost =
+    storeConfig.apiHost ||
     window.SYSTEMCE_HOST ||
     (location.protocol.indexOf('https') > -1 ? 'http://api.keenoho.space' : 'https://api.keenoho.space');
   setConfig({

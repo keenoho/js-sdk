@@ -1,5 +1,5 @@
 {
-	"name": "@keenoho/js-core",
+	"name": "@keenoho/js-sdk",
 	"version": "0.0.1",
 	"description": "keenoho js core",
 	"main": "./index.js",

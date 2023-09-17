@@ -7,7 +7,7 @@ const defaultAxiosOptions = {
   baseURL: '',
   params: undefined,
   data: undefined,
-  header: undefined,
+  headers: undefined,
   method: 'GET',
   cancelToken: undefined,
 };

@@ -1,1 +1,1 @@
-# @keenoho/sdk
+# @keenoho/js-sdk

@@ -1,33 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script></script>
-    <script src="../dist/browser/keenoho.umd.js"></script>
-  </head>
-  <body>
-    <script>
-      window.onload = () => {
-        console.log(window.Keenoho);
 
-        Keenoho.config.loadConfig()
-        Keenoho.config.setConfig({
-          app: '2201001547533701',
-          publicKey: 'EF534ECD9A7C69DF3D9D1B8DA2F9175D4A525FB2F9A98DDD66C39CC87ED4ED779082FC4DC23EB52DE85F5BB5E6954014',
-          apiHost: 'http://localhost:8000',
-        });
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <script src="http://static.keenoho.space/lib/uuid.min.js"></script>
+  <script src="http://static.keenoho.space/lib/axios.min.js"></script>
+  <script src="http://static.keenoho.space/lib/crypto-js.min.js"></script>
+  <script src="http://static.keenoho.space/lib/jquery.min.js"></script>
+  <script src="http://static.keenoho.space/lib/md5.min.js"></script>
+  <style>
+    input {
+      width: 300px;
+      height: 20px;
+    }
+  </style>
+</head>
 
-        console.log(window.Keenoho.config.getConfig());
+<body>
+  <div>
+    <table>
+      <tbody>
+        <tr>
+          <td>
+            <h2>base</h2>
+          </td>
+        </tr>
+        <tr>
+          <td>baseURL:</td>
+          <td><input id="baseURL" value="http://127.0.0.1:8000" /></td>
+        </tr>
+        <tr>
+          <td>app:</td>
+          <td><input id="app" value="1234567890123456" /></td>
+        </tr>
+        <tr>
+          <td>ttl:</td>
+          <td><input id="ttl" value="3600" /></td>
+        </tr>
+        <tr>
+          <td>token:</td>
+          <td><input id="token" value="" /></td>
+        </tr>
+        <tr>
+          <td>
+            <h2>signature</h2>
+          </td>
+        <tr>
+          <td>request</td>
+          <td><button id="testSignatureRequest">test signature request</button></td>
+        </tr>
+        </tr>
+        <tr>
+          <td>
+            <h2>function</h2>
+          </td>
+        </tr>
+        <tr>
+          <td>request</td>
+          <td>
+            <div style="display: flex;">
+              <select id="targetMethod">
+                <option value="POST">POST</option>
+                <option value="GET" selected>GET</option>
+              </select>
+              <div style="display: flex;flex-direction: column;">
+                <input id="targetUrl" type="text" value="/health">
+                <textarea id="targetQuery" cols="30" rows="6">{"p1":123,"p2":"hello","p3":true}</textarea>
+                <textarea id="targetBody" cols="30" rows="6">{"b1":456,"b2":"hi","b3":false}</textarea>
+              </div>
+            </div>
+            <hr>
+            <div>
+              <button id="sendMail">send mail</button>
+            </div>
+            <hr>
+            <div>
+              <button id="testServiceRequest">send request</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-        window.Keenoho.signature.sign().then(() => {
-          console.log(window.Keenoho.config.getConfig());
-        });
+  </div>
+  <script>
+    let token = ''
+    let session = ''
+    let signature = ''
 
-        // const sdk = new Keenoho.SDK();
-      };
-    </script>
-  </body>
+    const getBaseURL = () => $('#baseURL').val()
+    const getApp = () => +$('#app').val()
+    const getTtl = () => +$('#ttl').val()
+
+    const generateSign = (app, ttl, ts, randId) => {
+      const str = `${app}${ts}${ttl}${randId}`.split('').sort().join('')
+      return CryptoJS.HmacSHA1(str, app.toString()).toString();
+    }
+
+    const generateSignature = (url) => {
+      let app = getApp()
+      if (!token || !app) {
+        return ''
+      }
+
+      const str = `${app}:${url}`.split('').sort().join('')
+      const res = CryptoJS.HmacSHA1(str, token).toString();
+      return res
+    }
+
+    const requestFunc = (method = 'GET', url = '', query = {}, data = {}) => {
+      const headers = {
+        'x-app': getApp(),
+        'x-tk': token,
+        'x-sig': generateSignature(url),
+      }
+      return axios({
+        baseURL: getBaseURL(),
+        method,
+        url,
+        params: query,
+        data,
+        headers
+      }).then(res => res?.data?.data)
+    }
+
+    $(async () => {
+      const app = getApp()
+      const ttl = getTtl()
+      const ts = Date.now()
+      const randId = uuid.v4()
+      const sign = generateSign(app, ttl, ts, randId)
+      token = await requestFunc('GET', '/v1/signature/token', {
+        app,
+        ttl,
+        ts,
+        randId,
+        sign
+      }).then(res => {
+        $('#token').val(res)
+        return res
+      })
+
+      $('#testSignatureRequest').click(async () => {
+        const res = await requestFunc('GET', '/v1/signature/test')
+      })
+
+      $('#testServiceRequest').click(async () => {
+        const targetMethod = $('#targetMethod').val()
+        const targetUrl = $('#targetUrl').val()
+        const targetQuery = $('#targetQuery').val()
+        const targetBody = $('#targetBody').val()
+
+        let query = {}
+        let data = {}
+        if (targetQuery && targetQuery.length) {
+          try {
+            query = JSON.parse(targetQuery)
+          } catch (err) { }
+        }
+        if (targetBody && targetBody.length) {
+          try {
+            data = JSON.parse(targetBody)
+          } catch (err) { }
+        }
+
+        await requestFunc(targetMethod, targetUrl, query, data)
+      })
+
+
+      $('#sendMail').click(() => {
+        $('#targetMethod').val('POST')
+        $('#targetUrl').val('/v1/mail/send')
+        $('#targetQuery').val('')
+        $('#targetBody').val(JSON.stringify({
+          from: "none",
+          to: "1207893654@qq.com",
+          title: "test",
+          content: "<h1>test</h1>",
+        }))
+      })
+    })
+
+  </script>
+</body>
+
 </html>

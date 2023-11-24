@@ -1,65 +1,59 @@
 {
-	"name": "@keenoho/js-sdk",
-	"version": "0.0.1",
-	"description": "keenoho js core",
-	"main": "./index.js",
-	"scripts": {
-		"dev": "rollup -c ./rollup.config.js --bundleConfigAsCjs --watch",
-		"build": "rollup -c ./rollup.config.js --bundleConfigAsCjs",
-		"beforePublish": "node ./build/publish.js && npm run fmt && npm run build",
-		"fmt": "prettier -w ./src/**/*.*",
-		"publish": "npm publish --access public",
-    "server": "http-server -p 8080 --cors=* -o -c-1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/keenoho/js-sdk.git"
-	},
-	"author": "keenoho",
-	"license": "ISC",
-	"homepage": "https://github.com/keenoho/js-sdk.git",
-	"exports": {
-		".": {
-			"types": {
-				"require": "./index.d.ts",
-				"default": "./index.d.ts"
-			},
-			"browser": {
-				"require": "./dist/browser/sdk.umd.js",
-				"default": "./index.js"
-			},
-			"default": {
-				"require": "./dist/sdk.js",
-				"default": "./index.js"
-			}
-		},
-		"./package.json": "./package.json"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.21.4",
-		"@babel/preset-env": "^7.21.4",
-		"@babel/runtime": "^7.21.0",
-		"@rollup/plugin-babel": "^6.0.3",
-		"@rollup/plugin-commonjs": "^24.1.0",
-		"@rollup/plugin-json": "^6.0.0",
-		"@rollup/plugin-node-resolve": "^15.0.2",
-		"@rollup/plugin-terser": "^0.4.1",
-		"cross-env": "^7.0.3",
-		"prettier": "^2.8.8",
-		"rollup": "^3.20.7",
-		"rollup-plugin-auto-external": "^2.0.0"
-	},
-	"dependencies": {
-		"axios": "^1.3.6",
-		"crypto-js": "^4.1.1",
-		"md5": "^2.3.0",
-		"uuid": "^9.0.0"
-	},
-	"files": [
-		"./dist/*",
-		"./src/**/*.*",
-		"./index.js",
-		"./package.json",
-		"./index.d.ts"
-	]
+  "name": "@keenoho/js-sdk",
+  "version": "0.0.2",
+  "description": "keenoho js core",
+  "main": "./index.js",
+  "scripts": {
+    "dev": "rollup -c ./rollup.config.js --bundleConfigAsCjs --watch",
+    "build": "rollup -c ./rollup.config.js --bundleConfigAsCjs",
+    "fmt": "prettier -w ./src/**/*.*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keenoho/js-sdk.git"
+  },
+  "author": "keenoho",
+  "license": "ISC",
+  "homepage": "https://github.com/keenoho/js-sdk.git",
+  "exports": {
+    ".": {
+      "browser": {
+        "require": "./dist/keenoho.umd.js",
+        "default": "./dist/keenoho.umd.js"
+      },
+      "default": {
+        "require": "./dist/keenoho.cjs.js",
+        "default": "./index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.3",
+    "@babel/preset-env": "^7.23.3",
+    "@babel/runtime": "^7.23.4",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "cross-env": "^7.0.3",
+    "prettier": "^3.1.0",
+    "rollup": "^4.5.2",
+    "rollup-plugin-auto-external": "^2.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "crypto-js": "^4.2.0",
+    "md5": "^2.3.0",
+    "uuid": "^9.0.1"
+  },
+  "files": [
+    "./dist/*",
+    "./dist/**/*.*",
+    "./src/**/*.*",
+    "./index.js",
+    "./package.json",
+    "./index.d.ts"
+  ]
 }

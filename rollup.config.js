@@ -40,7 +40,7 @@ const buildConfig = ({
   };
   const input = { keenoho: './index.js' };
   const baseOutput = {
-    dir: `./dist${isBrowser ? '/browser' : ''}`,
+    dir: './dist',
     exports: 'default',
     name: 'Keenoho',
     sourcemap: true,
@@ -79,18 +79,6 @@ const buildConfig = ({
 export default () => {
   cleanDist(path.resolve(__dirname, './dist'));
   return [
-    // browser: umd
-    buildConfig({
-      isBrowser: true,
-      isEs5: true,
-      output: [
-        {
-          entryFileNames: '[name].umd.js',
-          format: 'umd',
-          exports: 'default',
-        },
-      ],
-    }),
     // browser minify: umd
     buildConfig({
       isBrowser: true,
@@ -99,19 +87,6 @@ export default () => {
       output: [
         {
           entryFileNames: '[name].umd.min.js',
-          format: 'umd',
-          exports: 'default',
-        },
-      ],
-    }),
-    // browser external: umd
-    buildConfig({
-      isBrowser: true,
-      isEs5: true,
-      useExternal: true,
-      output: [
-        {
-          entryFileNames: '[name].umd.external.js',
           format: 'umd',
           exports: 'default',
         },
@@ -135,7 +110,7 @@ export default () => {
     buildConfig({
       output: [
         {
-          entryFileNames: '[name].js',
+          entryFileNames: '[name].cjs.js',
           format: 'cjs',
           exports: 'default',
         },

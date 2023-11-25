@@ -5,8 +5,7 @@
   "main": "./index.js",
   "scripts": {
     "dev": "rollup -c ./rollup.config.js --bundleConfigAsCjs --watch",
-    "build": "rollup -c ./rollup.config.js --bundleConfigAsCjs",
-    "fmt": "prettier -w ./src/**/*.*"
+    "build": "rollup -c ./rollup.config.js --bundleConfigAsCjs"
   },
   "repository": {
     "type": "git",
@@ -37,8 +36,6 @@
     "@rollup/plugin-json": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "cross-env": "^7.0.3",
-    "prettier": "^3.1.0",
     "rollup": "^4.5.2",
     "rollup-plugin-auto-external": "^2.0.0"
   },

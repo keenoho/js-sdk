@@ -22,11 +22,20 @@ const sdkDefualtRequestOptions = {
 };
 
 export class SDK extends EventEmitter {
-  constructor() {
+  static getSessionHandler() {
+    return sessionStorage.getItem('keenoho_session');
+  }
+
+  static setSessionHandler(val) {
+    return sessionStorage.setItem('keenoho_session', val);
+  }
+
+  constructor(config) {
     super();
     this.event;
-    this.config = loadConfig();
+    this.config = config || loadConfig();
     this.token = undefined;
+    this.tokenExpired = undefined;
     this.init();
   }
 
@@ -41,7 +50,7 @@ export class SDK extends EventEmitter {
     const ts = Date.now();
     const randId = UUID();
     const sign = generateSign(app, ttl, ts, randId);
-    const { data } = await baseRequest({
+    const res = await baseRequest({
       baseURL,
       url: '/v1/signature/token',
       method: 'GET',
@@ -53,20 +62,24 @@ export class SDK extends EventEmitter {
         sign,
       },
     });
-    this.token = data;
+    const { token, expired } = res?.data || {};
+    this.token = token;
+    this.tokenExpired = expired;
   }
 
-  async request(axiosOptions = sdkDefaultAxiosOptions, requestOptions = sdkDefualtRequestOptions) {
+  request(axiosOptions = sdkDefaultAxiosOptions, requestOptions = sdkDefualtRequestOptions) {
     const aopt = Object.assign({}, sdkDefaultAxiosOptions, axiosOptions);
     const ropt = Object.assign({}, sdkDefualtRequestOptions, requestOptions);
 
     const token = this.token;
     const baseURL = this.config.API_HOST;
     const app = this.config.APP_ID;
+    const sid = SDK.getSessionHandler();
     const headers = {
       'x-app': app,
       'x-tk': token,
       'x-sig': generateSignature(axiosOptions.url, app, token),
+      'x-sid': sid,
     };
 
     aopt.baseURL = baseURL;
@@ -75,9 +88,39 @@ export class SDK extends EventEmitter {
     return baseRequest(aopt, ropt);
   }
 
-  async signatureTest() {
+  signatureTest() {
     return this.request({
       url: '/v1/signature/test',
+    });
+  }
+
+  sessionCheck() {
+    return this.request({
+      url: '/v1/signature/session/check',
+    });
+  }
+
+  sessionRefresh() {
+    return this.request({
+      url: '/v1/signature/session/refresh',
+    });
+  }
+
+  userLogin(data) {
+    return this.request({
+      url: '/v1/user/login',
+      method: 'POST',
+      data,
+    }).then((res) => {
+      const { session } = res?.data || {};
+      SDK.setSessionHandler(session);
+      return res;
+    });
+  }
+
+  userInfo() {
+    return this.request({
+      url: '/v1/user/info',
     });
   }
 }

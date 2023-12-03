@@ -48,11 +48,11 @@ export function baseRequest(axiosOptions = defaultAxiosOptions, requestOptions =
         let code = -1;
         let msg = 'request error';
 
-        if (err && err.response && err.response.data) {
+        if (err?.response?.data && typeof err?.response?.data === 'object' && 'data' in err?.response?.data) {
           data = err?.response?.data?.data || data;
           code = err?.response?.data?.code || code;
           msg = err?.response?.data?.msg || msg;
-        } else if (err && 'data' in err) {
+        } else if (err?.data && typeof err?.data === 'object' && 'data' in err?.data) {
           data = err?.data?.data || data;
           code = err?.data?.code || code;
           msg = err?.data?.msg || msg;

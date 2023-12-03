@@ -1,6 +1,6 @@
 {
   "name": "@keenoho/js-sdk",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "keenoho js core",
   "main": "./index.js",
   "scripts": {
@@ -16,16 +16,9 @@
   "homepage": "https://github.com/keenoho/js-sdk.git",
   "exports": {
     ".": {
-      "browser": {
-        "require": "./dist/keenoho.umd.js",
-        "default": "./dist/keenoho.umd.js"
-      },
-      "default": {
-        "require": "./dist/keenoho.cjs.js",
-        "default": "./index.js"
-      }
-    },
-    "./package.json": "./package.json"
+      "import": "./index.js",
+      "require": "./dist/keenoho.cjs.js"
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",
@@ -46,11 +39,9 @@
     "uuid": "^9.0.1"
   },
   "files": [
-    "./dist/*",
-    "./dist/**/*.*",
-    "./src/**/*.*",
-    "./index.js",
-    "./package.json",
-    "./index.d.ts"
+    "dist",
+    "src",
+    "index.js",
+    "package.json"
   ]
 }

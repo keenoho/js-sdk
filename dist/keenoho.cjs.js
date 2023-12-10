@@ -165,11 +165,16 @@ const sdkDefualtRequestOptions = {
 
 class SDK extends EventEmitter {
   static getSessionHandler() {
-    return sessionStorage.getItem('keenoho_session');
+    return localStorage.getItem('keenoho_session');
   }
 
-  static setSessionHandler(val) {
-    return sessionStorage.setItem('keenoho_session', val);
+  static setSessionHandler(session, expired, user) {
+    localStorage.setItem('keenoho_session', session);
+    localStorage.setItem('keenoho_session_expired', expired);
+    return {
+      session,
+      expired,
+    };
   }
 
   constructor(config) {
@@ -254,8 +259,8 @@ class SDK extends EventEmitter {
       method: 'POST',
       data,
     }).then((res) => {
-      const { session } = res?.data || {};
-      SDK.setSessionHandler(session);
+      const { session, expired, user } = res?.data || {};
+      SDK.setSessionHandler(session, expired, user);
       return res;
     });
   }

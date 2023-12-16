@@ -4,7 +4,7 @@ import { baseRequest } from './request';
 import { generateSign, generateSignature } from './util';
 import EventEmitter from './eventEmitter';
 
-const sdkDefaultAxiosOptions = {
+export const sdkDefaultAxiosOptions = {
   url: '',
   params: undefined,
   data: undefined,
@@ -12,13 +12,18 @@ const sdkDefaultAxiosOptions = {
   method: 'GET',
 };
 
-const sdkDefualtRequestOptions = {
+export const sdkDefualtRequestOptions = {
   showLoading: false,
   handleLoadingFunc: undefined,
   showError: false,
   handleErrorFunc: undefined,
   checkCode: true,
   targetCode: 0,
+};
+
+export const sdkDefaultOptions = {
+  autoRenewToken: true,
+  tokenTtl: 7200,
 };
 
 export class SDK extends EventEmitter {
@@ -35,9 +40,10 @@ export class SDK extends EventEmitter {
     };
   }
 
-  constructor(config) {
+  constructor(config, sdkOption = sdkDefaultOptions) {
     super();
     this.event;
+    this.sdkOption = sdkOption;
     this.config = config || loadConfig();
     this.token = undefined;
     this.tokenExpired = undefined;
@@ -49,7 +55,7 @@ export class SDK extends EventEmitter {
     this.emit('ready', this);
   }
 
-  async initToken(ttl = 7200) {
+  async initToken(ttl = this.sdkOption?.tokenTtl) {
     const baseURL = this.config.API_HOST;
     const app = this.config.APP_ID;
     const ts = Date.now();
@@ -72,7 +78,25 @@ export class SDK extends EventEmitter {
     this.tokenExpired = expired;
   }
 
-  request(axiosOptions = sdkDefaultAxiosOptions, requestOptions = sdkDefualtRequestOptions) {
+  async checkTokenExpired(
+    autoRenew = this.sdkOption?.autoRenew,
+    tokenTtl = this.sdkOption?.tokenTtl,
+    early = 10 * 60 * 1000
+  ) {
+    if (!this.token || !this.tokenExpired) {
+      return;
+    }
+    let isExpired = Date.now >= this.tokenExpired - early;
+    if (isExpired && autoRenew) {
+      await this.initToken(tokenTtl).then(() => {
+        isExpired = false;
+      });
+    }
+    return isExpired;
+  }
+
+  async request(axiosOptions = sdkDefaultAxiosOptions, requestOptions = sdkDefualtRequestOptions) {
+    await this.checkTokenExpired();
     const aopt = Object.assign({}, sdkDefaultAxiosOptions, axiosOptions);
     const ropt = Object.assign({}, sdkDefualtRequestOptions, requestOptions);
 
@@ -93,6 +117,7 @@ export class SDK extends EventEmitter {
     return baseRequest(aopt, ropt);
   }
 
+  // signature
   signatureTest() {
     return this.request({
       url: '/v1/signature/test',
@@ -111,6 +136,15 @@ export class SDK extends EventEmitter {
     });
   }
 
+  // user
+  userSignin(data) {
+    return this.request({
+      url: '/v1/user/signin',
+      method: 'POST',
+      data,
+    });
+  }
+
   userLogin(data) {
     return this.request({
       url: '/v1/user/login',
@@ -123,9 +157,18 @@ export class SDK extends EventEmitter {
     });
   }
 
-  userInfo() {
+  userInfo(params) {
     return this.request({
       url: '/v1/user/info',
+      params,
+    });
+  }
+
+  userUpdate(data) {
+    return this.request({
+      url: '/v1/user/update',
+      method: 'POST',
+      data,
     });
   }
 }

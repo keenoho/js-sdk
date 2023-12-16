@@ -313,6 +313,32 @@ class SDK extends EventEmitter {
       data,
     });
   }
+
+  // file
+  async fileUpload(filePath, file) {
+    const token = await this.request({
+      url: '/v1/file/token',
+      method: 'POST',
+      data: { filePath },
+    }).then((res) => {
+      if (res?.code === 0) {
+        return res?.data;
+      }
+    });
+    if (!token) {
+      throw new Error('get file upload token fail');
+    }
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('filePath', filePath);
+    formData.append('token', token);
+
+    return this.request({
+      url: '/v1/file/upload',
+      method: 'POST',
+      data: formData,
+    });
+  }
 }
 
 // import { isBrowser } from './src/util';

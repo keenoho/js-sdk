@@ -341,37 +341,20 @@ class SDK extends EventEmitter {
   }
 }
 
-// import { isBrowser } from './src/util';
+var SDK$1 = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  SDK: SDK,
+  sdkDefaultAxiosOptions: sdkDefaultAxiosOptions,
+  sdkDefaultOptions: sdkDefaultOptions,
+  sdkDefualtRequestOptions: sdkDefualtRequestOptions
+});
 
-// browser auto load
-// function browserAutoLoad() {
-//   document.addEventListener('DOMContentLoaded', () => {
-//     const scriptEle = document.querySelector('script#keenoho');
-//     if (!scriptEle) {
-//       return;
-//     }
-//     const src = scriptEle.getAttribute('src');
-//     if (!src) {
-//       return;
-//     }
-//     const searchParams = new URLSearchParams(src.split('?')[1] || '');
-//     const search = {};
-//     for (let k of searchParams.keys()) {
-//       search[k] = searchParams.get(k);
-//     }
-//     if (search.autoLoad) {
-//       window.KEENOHO = new SDK(search);
-//     }
-//   });
-// }
-// if (isBrowser()) {
-//   browserAutoLoad();
-// }
+// import { isBrowser } from './src/util';
 
 var index = {
   config,
   request,
-  SDK,
+  ...SDK$1,
 };
 
 module.exports = index;

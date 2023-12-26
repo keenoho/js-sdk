@@ -165,7 +165,7 @@ const sdkDefualtRequestOptions = {
 
 const sdkDefaultOptions = {
   autoRenewToken: true,
-  tokenTtl: 7200,
+  tokenTtl: 28800,
 };
 
 class SDK extends EventEmitter {

@@ -228,7 +228,7 @@ class SDK extends EventEmitter {
     if (!this.token || !this.tokenExpired) {
       return;
     }
-    let isExpired = Date.now >= this.tokenExpired - early;
+    let isExpired = Date.now() >= this.tokenExpired - early;
     if (isExpired && autoRenew) {
       await this.initToken(tokenTtl).then(() => {
         isExpired = false;

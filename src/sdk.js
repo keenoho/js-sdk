@@ -164,14 +164,6 @@ export class SDK extends EventEmitter {
     });
   }
 
-  userUpdate(data) {
-    return this.request({
-      url: '/v1/user/update',
-      method: 'POST',
-      data,
-    });
-  }
-
   // file
   async fileUpload(filePath, file) {
     const token = await this.request({

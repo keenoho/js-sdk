@@ -1,10 +1,7 @@
-// import { isBrowser } from './src/util';
-import * as config from './src/config';
-import * as request from './src/request';
-import * as SDK from './src/sdk';
+import {SDK} from './src/sdk';
 
-export default {
-  config,
-  request,
-  ...SDK,
-};
+export * from './src/config'
+export * from './src/request'
+export * from './src/sdk'
+
+export default SDK

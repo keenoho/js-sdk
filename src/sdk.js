@@ -31,7 +31,7 @@ export class SDK extends EventEmitter {
     return localStorage.getItem('keenoho_session');
   }
 
-  static setSessionHandler(session, expired, user) {
+  static setSessionHandler(session, expired) {
     localStorage.setItem('keenoho_session', session);
     localStorage.setItem('keenoho_session_expired', expired);
     return {
@@ -118,9 +118,9 @@ export class SDK extends EventEmitter {
   }
 
   // signature
-  signatureTest() {
+  signatureCheck() {
     return this.request({
-      url: '/v1/signature/test',
+      url: '/v1/signature/check',
     });
   }
 
@@ -133,60 +133,6 @@ export class SDK extends EventEmitter {
   sessionRefresh() {
     return this.request({
       url: '/v1/signature/session/refresh',
-    });
-  }
-
-  // user
-  userSignin(data) {
-    return this.request({
-      url: '/v1/user/signin',
-      method: 'POST',
-      data,
-    });
-  }
-
-  userLogin(data) {
-    return this.request({
-      url: '/v1/user/login',
-      method: 'POST',
-      data,
-    }).then((res) => {
-      const { session, expired, user } = res?.data || {};
-      SDK.setSessionHandler(session, expired, user);
-      return res;
-    });
-  }
-
-  userInfo(params) {
-    return this.request({
-      url: '/v1/user/info',
-      params,
-    });
-  }
-
-  // file
-  async fileUpload(filePath, file) {
-    const token = await this.request({
-      url: '/v1/file/token',
-      method: 'POST',
-      data: { filePath },
-    }).then((res) => {
-      if (res?.code === 0) {
-        return res?.data;
-      }
-    });
-    if (!token) {
-      throw new Error('get file upload token fail');
-    }
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('filePath', filePath);
-    formData.append('token', token);
-
-    return this.request({
-      url: '/v1/file/upload',
-      method: 'POST',
-      data: formData,
     });
   }
 }

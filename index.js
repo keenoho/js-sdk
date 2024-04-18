@@ -1,7 +1,7 @@
-import {SDK} from './src/sdk';
+import { SDK } from './src/sdk';
 
-export * from './src/config'
-export * from './src/request'
-export * from './src/sdk'
+export * from './src/config';
+export * from './src/request';
+export * from './src/sdk';
 
-export default SDK
+export default SDK;

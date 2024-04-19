@@ -78,6 +78,12 @@ export class SDK extends EventEmitter {
     this.tokenExpired = expired;
   }
 
+  usePlugin(plugin, option) {
+    if (plugin?.install && typeof plugin.install === 'function') {
+      plugin.install(this, option);
+    }
+  }
+
   async checkTokenExpired(
     autoRenew = this.sdkOption?.autoRenew,
     tokenTtl = this.sdkOption?.tokenTtl,

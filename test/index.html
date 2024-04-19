@@ -10,6 +10,7 @@
     var API_HOST = "http://127.0.0.1:8000"
   </script>
   <script src="../dist/keenoho.umd.min.js"></script>
+  <script src="../dist/tool.plugin.min.js"></script>
 </head>
 
 <body>
@@ -22,21 +23,18 @@
     }
 
     const sdk = new window.Keenoho.SDK()
+    sdk.usePlugin(KeenohoToolPlugin.Plugin)
     sdk.on('ready', async () => {
       const res = await sdk.signatureCheck()
       console.log('signatureCheck', res)
     })
 
     function sendMail() {
-      sdk.request({
-        method: 'POST',
-        url: '/v1/mail/send',
-        data: {
-          from: '111',
-          to: '1207893654@qq.com',
-          title: '22',
-          content: '333',
-        },
+      sdk.sendMail({
+        from: '111',
+        to: '1207893654@qq.com',
+        title: '22',
+        content: '333',
       })
     }
   </script>

@@ -13,6 +13,9 @@
 </head>
 
 <body>
+  <div id="root">
+    <button onclick="sendMail()">send mail</button>
+  </div>
   <script>
     if (!window.Keenoho.SDK) {
       throw new Error('the sdk is not exist')
@@ -20,9 +23,22 @@
 
     const sdk = new window.Keenoho.SDK()
     sdk.on('ready', async () => {
-      const res = await sdk.signatureTest()
-      console.log(res)
+      const res = await sdk.signatureCheck()
+      console.log('signatureCheck', res)
     })
+
+    function sendMail() {
+      sdk.request({
+        method: 'POST',
+        url: '/v1/mail/send',
+        data: {
+          from: '111',
+          to: '1207893654@qq.com',
+          title: '22',
+          content: '333',
+        },
+      })
+    }
   </script>
 </body>
 

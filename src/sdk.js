@@ -24,24 +24,27 @@ export const sdkDefualtRequestOptions = {
 
 export const sdkDefaultOptions = {
   autoRenewToken: true,
-  tokenTtl: 3600 * 8,
+  tokenTtl: 3600 * 4,
 };
 
 export class SDK extends EventEmitter {
-  static getSessionHandler() {
+  static getSessionHandler(onlySessionId = false) {
+    if (onlySessionId) {
+      return localStorage.getItem('keenoho_session') || '';
+    }
     return {
       session: localStorage.getItem('keenoho_session') || '',
       expired: +localStorage.getItem('keenoho_session_expired') || undefined,
     };
   }
 
-  static getSessionIdHandler() {
-    return localStorage.getItem('keenoho_session') || '';
-  }
-
   static setSessionHandler(res) {
-    localStorage.setItem('keenoho_session', res?.data?.session || '');
-    localStorage.setItem('keenoho_session_expired', res?.data?.expired || '');
+    if (res?.data?.session) {
+      localStorage.setItem('keenoho_session', res?.data?.session || '');
+    }
+    if (res?.data?.expired) {
+      localStorage.setItem('keenoho_session_expired', res?.data?.expired || '');
+    }
   }
 
   static removeSessionHandler() {
@@ -49,11 +52,11 @@ export class SDK extends EventEmitter {
     localStorage.removeItem('keenoho_session_expired');
   }
 
-  constructor(config, sdkOption = sdkDefaultOptions) {
+  constructor(config, sdkOption) {
     super();
     this.event;
-    this.sdkOption = sdkOption;
-    this.config = config || loadConfig();
+    this.sdkOption = Object.assign({}, sdkDefaultOptions, sdkOption);
+    this.config = Object.assign({}, config, loadConfig());
     this.token = undefined;
     this.tokenExpired = undefined;
     this.init();
@@ -94,15 +97,14 @@ export class SDK extends EventEmitter {
   }
 
   async checkTokenExpired(
-    autoRenew = this.sdkOption?.autoRenew,
     tokenTtl = this.sdkOption?.tokenTtl,
-    early = 10 * 60 * 1000
+    early = 60 * 1000
   ) {
     if (!this.token || !this.tokenExpired) {
       return;
     }
     let isExpired = Date.now() >= this.tokenExpired - early;
-    if (isExpired && autoRenew) {
+    if (isExpired && this.sdkOption?.autoRenewToken) {
       await this.initToken(tokenTtl).then(() => {
         isExpired = false;
       });
@@ -118,7 +120,7 @@ export class SDK extends EventEmitter {
     const token = this.token;
     const baseURL = this.config.API_HOST;
     const app = this.config.APP_ID;
-    const sid = SDK.getSessionIdHandler();
+    const sid = SDK.getSessionHandler(true);
     const headers = {
       'x-app': app,
       'x-tk': token,
@@ -156,10 +158,6 @@ export class SDK extends EventEmitter {
   }
 
   sessionLogout() {
-    const { session, expired } = SDK.getSessionHandler();
-    if (!session || expired <= Date.now()) {
-      throw makeResponse(null, -1, 'Please login first');
-    }
     return this.request({
       method: 'POST',
       url: '/v1/session/logout',
@@ -175,9 +173,14 @@ export class SDK extends EventEmitter {
     });
   }
 
-  sessionRefresh() {
+  sessionRefresh(data) {
     return this.request({
+      method: 'POST',
       url: '/v1/session/refresh',
+      data,
+    }).then((res) => {
+      SDK.setSessionHandler(res);
+      return res;
     });
   }
 }

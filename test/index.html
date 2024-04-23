@@ -10,30 +10,46 @@
     var API_HOST = "http://127.0.0.1:8000"
     var APP_ID = 2310014529857003
   </script>
-  <script src="../dist/keenoho.umd.min.js"></script>
+  <script src="../dist/keenoho.umd.js"></script>
   <script src="../dist/tool.plugin.min.js"></script>
 </head>
 
 <body>
   <div id="root">
+    <div id="token"></div>
+    <div id="tokenExpired"></div>
+    <button onclick="signatureCheck()">signature check</button>
     <button onclick="sendMail()">send mail</button>
     <button onclick="sessionLogin()">session login</button>
     <button onclick="sessionLogout()">session logout</button>
+    <button onclick="sessionCheck()">session check</button>
+    <button onclick="sessionRefresh()">session refresh</button>
   </div>
   <script>
     if (!window.Keenoho.SDK) {
       throw new Error('the sdk is not exist')
     }
-
+    const tokenEle = document.getElementById('token')
+    const tokenExpiredEle = document.getElementById('tokenExpired')
     let globalSessionId = undefined
     let globalSessionIdExpired = undefined
 
-    const sdk = new window.Keenoho.SDK()
+    const sdk = new window.Keenoho.SDK(null, {
+      tokenTtl: 120,
+    })
     sdk.usePlugin(KeenohoToolPlugin.Plugin)
     sdk.on('ready', async () => {
       const res = await sdk.signatureCheck()
       console.log('signatureCheck', res)
+      setInterval(() => {
+        tokenEle.innerHTML = sdk.token
+        tokenExpiredEle.innerHTML = new Date(sdk.tokenExpired)
+      }, 1000)
     })
+
+    function signatureCheck() {
+      sdk.signatureCheck()
+    }
 
     function sendMail() {
       sdk.sendMail({
@@ -58,6 +74,20 @@
 
     function sessionLogout() {
       sdk.sessionLogout().then(res => {
+        console.log(res)
+      })
+    }
+
+    function sessionCheck() {
+      sdk.sessionCheck().then(res => {
+        console.log(res)
+      })
+    }
+
+    function sessionRefresh() {
+      sdk.sessionRefresh({
+        ttl: 10
+      }).then(res => {
         console.log(res)
       })
     }

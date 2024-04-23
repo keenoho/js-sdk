@@ -16,6 +16,7 @@
 <body>
   <div id="root">
     <button onclick="sendMail()">send mail</button>
+    <button onclick="sessionLogin()">session login</button>
   </div>
   <script>
     if (!window.Keenoho.SDK) {
@@ -35,6 +36,14 @@
         to: '1207893654@qq.com',
         title: '22',
         content: '333',
+      })
+    }
+
+    function sessionLogin() {
+      sdk.sessionLogin({
+        type: 'account',
+        account: 'test912',
+        password: '1234'
       })
     }
   </script>

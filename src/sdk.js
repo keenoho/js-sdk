@@ -1,3 +1,4 @@
+import md5 from 'md5';
 import { v4 as UUID } from 'uuid';
 import { loadConfig } from './config';
 import { baseRequest } from './request';
@@ -130,15 +131,36 @@ export class SDK extends EventEmitter {
     });
   }
 
+  // session
+  sessionLogin(data) {
+    const sendData = { ...data };
+    if (sendData.password) {
+      sendData.password = md5(sendData.password);
+    }
+    return this.request({
+      method: 'POST',
+      url: '/v1/session/login',
+      data: sendData,
+    });
+  }
+
+  sessionLogout(data) {
+    return this.request({
+      method: 'POST',
+      url: '/v1/session/logout',
+      data,
+    });
+  }
+
   sessionCheck() {
     return this.request({
-      url: '/v1/signature/session/check',
+      url: '/v1/session/check',
     });
   }
 
   sessionRefresh() {
     return this.request({
-      url: '/v1/signature/session/refresh',
+      url: '/v1/session/refresh',
     });
   }
 }

@@ -8,6 +8,7 @@
   <script>
     var ENV = "development"
     var API_HOST = "http://127.0.0.1:8000"
+    var APP_ID = 2310014529857003
   </script>
   <script src="../dist/keenoho.umd.min.js"></script>
   <script src="../dist/tool.plugin.min.js"></script>
@@ -17,11 +18,15 @@
   <div id="root">
     <button onclick="sendMail()">send mail</button>
     <button onclick="sessionLogin()">session login</button>
+    <button onclick="sessionLogout()">session logout</button>
   </div>
   <script>
     if (!window.Keenoho.SDK) {
       throw new Error('the sdk is not exist')
     }
+
+    let globalSessionId = undefined
+    let globalSessionIdExpired = undefined
 
     const sdk = new window.Keenoho.SDK()
     sdk.usePlugin(KeenohoToolPlugin.Plugin)
@@ -36,6 +41,8 @@
         to: '1207893654@qq.com',
         title: '22',
         content: '333',
+      }).then(res => {
+        console.log(res)
       })
     }
 
@@ -44,6 +51,14 @@
         type: 'account',
         account: 'test912',
         password: '1234'
+      }).then(res => {
+        console.log(res)
+      })
+    }
+
+    function sessionLogout() {
+      sdk.sessionLogout().then(res => {
+        console.log(res)
       })
     }
   </script>

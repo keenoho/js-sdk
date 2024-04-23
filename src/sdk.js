@@ -2,7 +2,7 @@ import md5 from 'md5';
 import { v4 as UUID } from 'uuid';
 import { loadConfig } from './config';
 import { baseRequest } from './request';
-import { generateSign, generateSignature } from './util';
+import { generateSign, generateSignature, makeResponse } from './util';
 import EventEmitter from './eventEmitter';
 
 export const sdkDefaultAxiosOptions = {
@@ -24,21 +24,29 @@ export const sdkDefualtRequestOptions = {
 
 export const sdkDefaultOptions = {
   autoRenewToken: true,
-  tokenTtl: 28800,
+  tokenTtl: 3600 * 8,
 };
 
 export class SDK extends EventEmitter {
   static getSessionHandler() {
-    return localStorage.getItem('keenoho_session');
+    return {
+      session: localStorage.getItem('keenoho_session') || '',
+      expired: +localStorage.getItem('keenoho_session_expired') || undefined,
+    };
   }
 
-  static setSessionHandler(session, expired) {
-    localStorage.setItem('keenoho_session', session);
-    localStorage.setItem('keenoho_session_expired', expired);
-    return {
-      session,
-      expired,
-    };
+  static getSessionIdHandler() {
+    return localStorage.getItem('keenoho_session') || '';
+  }
+
+  static setSessionHandler(res) {
+    localStorage.setItem('keenoho_session', res?.data?.session || '');
+    localStorage.setItem('keenoho_session_expired', res?.data?.expired || '');
+  }
+
+  static removeSessionHandler() {
+    localStorage.removeItem('keenoho_session');
+    localStorage.removeItem('keenoho_session_expired');
   }
 
   constructor(config, sdkOption = sdkDefaultOptions) {
@@ -110,7 +118,7 @@ export class SDK extends EventEmitter {
     const token = this.token;
     const baseURL = this.config.API_HOST;
     const app = this.config.APP_ID;
-    const sid = SDK.getSessionHandler();
+    const sid = SDK.getSessionIdHandler();
     const headers = {
       'x-app': app,
       'x-tk': token,
@@ -132,7 +140,7 @@ export class SDK extends EventEmitter {
   }
 
   // session
-  sessionLogin(data) {
+  sessionLogin(data, setSessionHandler = SDK.setSessionHandler) {
     const sendData = { ...data };
     if (sendData.password) {
       sendData.password = md5(sendData.password);
@@ -141,14 +149,23 @@ export class SDK extends EventEmitter {
       method: 'POST',
       url: '/v1/session/login',
       data: sendData,
+    }).then((res) => {
+      setSessionHandler(res);
+      return res;
     });
   }
 
-  sessionLogout(data) {
+  sessionLogout() {
+    const { session, expired } = SDK.getSessionHandler();
+    if (!session || expired <= Date.now()) {
+      throw makeResponse(null, -1, 'Please login first');
+    }
     return this.request({
       method: 'POST',
       url: '/v1/session/logout',
-      data,
+    }).then((res) => {
+      SDK.removeSessionHandler(res);
+      return res;
     });
   }
 

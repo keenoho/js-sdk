@@ -16,8 +16,22 @@
 
 <body>
   <div id="root">
-    <div id="token"></div>
-    <div id="tokenExpired"></div>
+    <div>
+      <span>token: </span>
+      <span id="token">-</span>
+    </div>
+    <div>
+      <span>tokenExpired: </span>
+      <span id="tokenExpired">-</span>
+    </div>
+    <div>
+      <span>session: </span>
+      <span id="session">-</span>
+    </div>
+    <div>
+      <span>sessionExpired: </span>
+      <span id="sessionExpired">-</span>
+    </div>
     <button onclick="signatureCheck()">signature check</button>
     <button onclick="sendMail()">send mail</button>
     <button onclick="sessionLogin()">session login</button>
@@ -31,6 +45,8 @@
     }
     const tokenEle = document.getElementById('token')
     const tokenExpiredEle = document.getElementById('tokenExpired')
+    const sessionEle = document.getElementById('session')
+    const sessionExpiredEle = document.getElementById('sessionExpired')
     let globalSessionId = undefined
     let globalSessionIdExpired = undefined
 
@@ -44,6 +60,12 @@
       setInterval(() => {
         tokenEle.innerHTML = sdk.token
         tokenExpiredEle.innerHTML = new Date(sdk.tokenExpired)
+        const {
+          session,
+          expired
+        } = window.Keenoho.SDK.getSessionHandler()
+        sessionEle.innerHTML = session
+        sessionExpiredEle.innerHTML = expired
       }, 1000)
     })
 

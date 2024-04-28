@@ -55,17 +55,6 @@ const sdkBuildList = [
     external,
     drop: ['console', 'debugger'],
   },
-  // plugin
-  {
-    entryPoints: ['./plugin/tool.plugin.js'],
-    outfile: './dist/tool.plugin.min.js',
-    format: 'iife',
-    globalName: 'KeenohoToolPlugin',
-    target: 'es2015',
-    external,
-    minify: true,
-    drop: ['console', 'debugger'],
-  },
 ];
 
 function checkNodeVersion() {
@@ -111,7 +100,6 @@ function handleWatch() {
     }, 500);
   };
   fs.watch(srcDir, { recursive: true }, watchCallback);
-  fs.watch(pluginDir, { recursive: true }, watchCallback);
 }
 
 async function run() {

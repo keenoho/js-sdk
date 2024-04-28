@@ -96,10 +96,7 @@ export class SDK extends EventEmitter {
     }
   }
 
-  async checkTokenExpired(
-    tokenTtl = this.sdkOption?.tokenTtl,
-    early = 60 * 1000
-  ) {
+  async checkTokenExpired(tokenTtl = this.sdkOption?.tokenTtl, early = 60 * 1000) {
     if (!this.token || !this.tokenExpired) {
       return;
     }
@@ -182,5 +179,36 @@ export class SDK extends EventEmitter {
       SDK.setSessionHandler(res);
       return res;
     });
+  }
+
+  // tool
+  uploadFile({ filePath, file }) {
+    return this.request({
+      url: '/v1/file/token',
+      method: 'GET',
+      params: { filePath },
+    })
+      .then((res) => {
+        if (res?.code !== 0) {
+          throw res;
+        }
+        const token = res?.data;
+        if (!token) {
+          throw new Error('获取上传token失败');
+        }
+        return token;
+      })
+      .then((token) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('filePath', filePath);
+        formData.append('token', token);
+
+        return this.request({
+          url: '/v1/file/upload',
+          method: 'POST',
+          data: formData,
+        });
+      });
   }
 }

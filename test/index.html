@@ -33,11 +33,12 @@
       <span id="sessionExpired">-</span>
     </div>
     <button onclick="signatureCheck()">signature check</button>
-    <button onclick="sendMail()">send mail</button>
     <button onclick="sessionLogin()">session login</button>
     <button onclick="sessionLogout()">session logout</button>
     <button onclick="sessionCheck()">session check</button>
     <button onclick="sessionRefresh()">session refresh</button>
+    <button onclick="sendMail()">send mail</button>
+    <input type="file" name="file" id="file" onchange="fileChange(event)">
   </div>
   <script>
     if (!window.Keenoho.SDK) {
@@ -47,11 +48,13 @@
     const tokenExpiredEle = document.getElementById('tokenExpired')
     const sessionEle = document.getElementById('session')
     const sessionExpiredEle = document.getElementById('sessionExpired')
+    const fileEle = document.getElementById('file')
+
     let globalSessionId = undefined
     let globalSessionIdExpired = undefined
 
     const sdk = new window.Keenoho.SDK(null, {
-      tokenTtl: 120,
+      tokenTtl: 3600,
     })
     sdk.usePlugin(KeenohoToolPlugin.Plugin)
     sdk.on('ready', async () => {
@@ -109,6 +112,21 @@
     function sessionRefresh() {
       sdk.sessionRefresh({
         ttl: 10
+      }).then(res => {
+        console.log(res)
+      })
+    }
+
+    function fileChange(e) {
+      const now = new Date()
+      const targetFile = e.target.files[0]
+      const splitName = targetFile.name.split('.')
+      const ext = splitName[splitName.length - 1]
+      const filePath = `/some/path/${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}/${Date.now()%1000}.${ext}`
+      console.log(filePath)
+      sdk.uploadFile({
+        filePath,
+        file: targetFile
       }).then(res => {
         console.log(res)
       })

@@ -10,19 +10,12 @@ export const Plugin = {
     };
 
     // file
-    sdk.getFileToken = function (params) {
-      return sdk.request({
-        method: 'GET',
-        url: '/v1/file/token',
-        params,
-      });
-    };
-    sdk.uploadFile = function (filePath, file) {
+    sdk.uploadFile = function ({ filePath, file }) {
       sdk
         .request({
           url: '/v1/file/token',
-          method: 'POST',
-          data: { filePath },
+          method: 'GET',
+          params: { filePath },
         })
         .then((res) => {
           if (res?.code !== 0) {

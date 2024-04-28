@@ -2,7 +2,7 @@ import md5 from 'md5';
 import { v4 as UUID } from 'uuid';
 import { loadConfig } from './config';
 import { baseRequest } from './request';
-import { generateSign, generateSignature, makeResponse } from './util';
+import { generateSign, generateSignature } from './util';
 import EventEmitter from './eventEmitter';
 
 export const sdkDefaultAxiosOptions = {

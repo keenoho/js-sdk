@@ -211,4 +211,13 @@ export class SDK extends EventEmitter {
         });
       });
   }
+
+  // user
+  userInfo(params) {
+    return this.request({
+      url: '/v1/user/info',
+      method: 'GET',
+      params,
+    });
+  }
 }

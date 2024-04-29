@@ -124,8 +124,7 @@
       const targetFile = e.target.files[0]
       const splitName = targetFile.name.split('.')
       const ext = splitName[splitName.length - 1]
-      const filePath = `/some/path/${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}/${Date.now()%1000}.${ext}`
-      console.log(filePath)
+      const filePath = `/some/path/${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}/${Date.now()%10000}.${ext}`
       sdk.uploadFile({
         filePath,
         file: targetFile

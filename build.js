@@ -5,7 +5,6 @@ const esbuild = require('esbuild');
 const rootDir = path.resolve(__dirname);
 const srcDir = path.resolve(rootDir, 'src');
 const distDir = path.resolve(rootDir, 'dist');
-const pluginDir = path.resolve(rootDir, 'plugin');
 const isWatch = !!process.argv.find((v) => v.indexOf('watch') > -1);
 const packageJson = require('./package.json');
 const external = Object.keys(packageJson.dependencies);

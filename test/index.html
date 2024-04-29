@@ -36,6 +36,7 @@
     <button onclick="sessionLogout()">session logout</button>
     <button onclick="sessionCheck()">session check</button>
     <button onclick="sessionRefresh()">session refresh</button>
+    <button onclick="userInfo()">user info</button>
     <button onclick="sendMail()">send mail</button>
     <input type="file" name="file" id="file" onchange="fileChange(event)">
   </div>
@@ -129,6 +130,12 @@
         filePath,
         file: targetFile
       }).then(res => {
+        console.log(res)
+      })
+    }
+
+    function userInfo() {
+      sdk.userInfo().then(res => {
         console.log(res)
       })
     }

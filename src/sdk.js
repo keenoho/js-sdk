@@ -56,7 +56,7 @@ export class SDK extends EventEmitter {
     super();
     this.event;
     this.sdkOption = Object.assign({}, sdkDefaultOptions, sdkOption);
-    this.config = Object.assign({}, config, loadConfig());
+    this.config = Object.assign({}, loadConfig(), config);
     this.token = undefined;
     this.tokenExpired = undefined;
     this.init();

@@ -73,7 +73,7 @@ export class SDK extends EventEmitter {
     const ts = Date.now();
     const randId = UUID();
     const sign = generateSign(app, ttl, ts, randId);
-    const res = await baseRequest({
+    const res = await this.sdkBaseRequest({
       baseURL,
       url: '/v1/signature/token',
       method: 'GET',
@@ -109,6 +109,15 @@ export class SDK extends EventEmitter {
     return isExpired;
   }
 
+  sdkBaseRequest(aopt = sdkDefaultAxiosOptions, ropt = sdkDefualtRequestOptions) {
+    return baseRequest(aopt, ropt)
+      .then((res) => res)
+      .catch((err) => {
+        this.emit('error', err);
+        throw err;
+      });
+  }
+
   async request(axiosOptions = sdkDefaultAxiosOptions, requestOptions = sdkDefualtRequestOptions) {
     await this.checkTokenExpired();
     const aopt = Object.assign({}, sdkDefaultAxiosOptions, axiosOptions);
@@ -128,7 +137,7 @@ export class SDK extends EventEmitter {
     aopt.baseURL = baseURL;
     aopt.headers = Object.assign(headers, aopt.headers);
 
-    return baseRequest(aopt, ropt);
+    return this.sdkBaseRequest(aopt, ropt);
   }
 
   // signature

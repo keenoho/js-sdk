@@ -54,23 +54,28 @@
     let globalSessionIdExpired = undefined
 
     const sdk = new window.Keenoho.SDK(null, {
-      tokenTtl: 3600,
+      // tokenTtl: 3600,
     })
     sdk.on('error', (err) => console.log(err))
     sdk.on('ready', async () => {
       const res = await sdk.signatureCheck()
       console.log('signatureCheck', res)
+      render()
       setInterval(() => {
-        tokenEle.innerHTML = sdk.token
-        tokenExpiredEle.innerHTML = new Date(sdk.tokenExpired)
-        const {
-          session,
-          expired
-        } = window.Keenoho.SDK.getSessionHandler()
-        sessionEle.innerHTML = session
-        sessionExpiredEle.innerHTML = expired
-      }, 1000)
+        render()
+      }, 2500)
     })
+
+    function render() {
+      tokenEle.innerHTML = sdk.token
+      tokenExpiredEle.innerHTML = new Date(sdk.tokenExpired)
+      const {
+        session,
+        expired
+      } = window.Keenoho.SDK.getSessionHandler()
+      sessionEle.innerHTML = session
+      sessionExpiredEle.innerHTML = expired
+    }
 
     function signatureCheck() {
       sdk.signatureCheck()

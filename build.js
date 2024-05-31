@@ -6,8 +6,11 @@ const rootDir = path.resolve(__dirname);
 const srcDir = path.resolve(rootDir, 'src');
 const distDir = path.resolve(rootDir, 'dist');
 const isWatch = !!process.argv.find((v) => v.indexOf('watch') > -1);
-const packageJson = require('./package.json');
-const external = Object.keys(packageJson.dependencies);
+const externals = {
+  axios: 'axios',
+  'crypto-js': 'CryptoJS',
+  uuid: 'uuid',
+};
 const sdkBuildList = [
   // full
   {
@@ -15,14 +18,14 @@ const sdkBuildList = [
     outfile: './dist/keenoho.umd.js',
     format: 'iife',
     globalName: 'Keenoho',
-    target: 'es2015',
+    target: ['es2015'],
   },
   {
     entryPoints: ['./index.js'],
     outfile: './dist/keenoho.umd.min.js',
     format: 'iife',
     globalName: 'Keenoho',
-    target: 'es2015',
+    target: ['es2015'],
     minify: true,
     drop: ['console', 'debugger'],
   },
@@ -32,18 +35,22 @@ const sdkBuildList = [
     outfile: './dist/keenoho.umd.external.js',
     format: 'iife',
     globalName: 'Keenoho',
-    target: 'es2015',
-    external,
+    target: ['es2015'],
+    packages: 'external',
+    inject: ['./inject.js'],
+    plugins: [injectPlugin()],
   },
   {
     entryPoints: ['./index.js'],
     outfile: './dist/keenoho.umd.external.min.js',
     format: 'iife',
     globalName: 'Keenoho',
-    target: 'es2015',
-    external,
+    target: ['es2015'],
     minify: true,
     drop: ['console', 'debugger'],
+    packages: 'external',
+    inject: ['./inject.js'],
+    plugins: [injectPlugin()],
   },
   // cjs
   {
@@ -51,8 +58,8 @@ const sdkBuildList = [
     outfile: './dist/keenoho.cjs.js',
     format: 'cjs',
     target: 'esnext',
-    external,
     drop: ['console', 'debugger'],
+    packages: 'external',
   },
 ];
 
@@ -87,6 +94,29 @@ async function buildFiles() {
   }
   await Promise.all(buildList);
   console.timeEnd('build');
+}
+
+function injectPlugin() {
+  return {
+    name: 'injectPlugin',
+    setup(build) {
+      build.onResolve({ filter: /inject/ }, (args) => {
+        return {
+          path: args.path,
+          namespace: 'injectPlugin',
+        };
+      });
+
+      build.onLoad({ filter: /inject/ }, (args) => {
+        let contents = fs.readFileSync(path.resolve(rootDir, args.path), 'utf-8');
+        contents = `const externals = ${JSON.stringify(externals)};\n` + contents;
+        return {
+          loader: 'js',
+          contents,
+        };
+      });
+    },
+  };
 }
 
 function handleWatch() {

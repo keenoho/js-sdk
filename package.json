@@ -21,9 +21,9 @@
     }
   },
   "dependencies": {
-    "axios": "^1.6.2",
+    "axios": "^1.7.2",
     "crypto-js": "^4.2.0",
-    "esbuild": "^0.20.2",
+    "esbuild": "^0.21.4",
     "md5": "^2.3.0",
     "uuid": "^9.0.1"
   },

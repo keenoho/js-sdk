@@ -1,4 +1,3 @@
-import md5 from 'md5';
 import { v4 as UUID } from 'uuid';
 import { loadConfig } from './config';
 import { baseRequest } from './request';
@@ -150,9 +149,6 @@ export class SDK extends EventEmitter {
   // session
   sessionLogin(data, setSessionHandler = SDK.setSessionHandler) {
     const sendData = { ...data };
-    if (sendData.password) {
-      sendData.password = md5(sendData.password);
-    }
     return this.request({
       method: 'POST',
       url: '/v1/session/login',

@@ -1,4 +1,4 @@
-import { HmacSHA1 } from 'crypto-js';
+import { HmacSHA1, AES } from 'crypto-js';
 
 export function isBrowser() {
   return typeof document === 'object';

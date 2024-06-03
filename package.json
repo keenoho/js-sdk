@@ -4,6 +4,7 @@
   "description": "keenoho js sdk",
   "main": "./index.js",
   "scripts": {
+    "debug": "nodemon --ignore dist ./build.js",
     "dev": "node ./build.js --watch",
     "build": "node ./build.js"
   },
@@ -24,6 +25,7 @@
     "axios": "^1.7.2",
     "crypto-js": "^4.2.0",
     "esbuild": "^0.21.4",
+    "@swc/core": "^1.5.24",
     "uuid": "^9.0.1"
   },
   "files": [

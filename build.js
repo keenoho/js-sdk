@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const esbuild = require('esbuild');
+const externalPlugin = require('./externalPlugin');
 
 const rootDir = path.resolve(__dirname);
 const srcDir = path.resolve(rootDir, 'src');
@@ -37,8 +38,7 @@ const sdkBuildList = [
     globalName: 'Keenoho',
     target: ['es2015'],
     packages: 'external',
-    inject: ['./inject.js'],
-    plugins: [injectPlugin()],
+    plugins: [externalPlugin(externals)],
   },
   {
     entryPoints: ['./index.js'],
@@ -49,8 +49,7 @@ const sdkBuildList = [
     minify: true,
     drop: ['console', 'debugger'],
     packages: 'external',
-    inject: ['./inject.js'],
-    plugins: [injectPlugin()],
+    plugins: [externalPlugin(externals)],
   },
   // cjs
   {
@@ -94,29 +93,6 @@ async function buildFiles() {
   }
   await Promise.all(buildList);
   console.timeEnd('build');
-}
-
-function injectPlugin() {
-  return {
-    name: 'injectPlugin',
-    setup(build) {
-      build.onResolve({ filter: /inject/ }, (args) => {
-        return {
-          path: args.path,
-          namespace: 'injectPlugin',
-        };
-      });
-
-      build.onLoad({ filter: /inject/ }, (args) => {
-        let contents = fs.readFileSync(path.resolve(rootDir, args.path), 'utf-8');
-        contents = `const externals = ${JSON.stringify(externals)};\n` + contents;
-        return {
-          loader: 'js',
-          contents,
-        };
-      });
-    },
-  };
 }
 
 function handleWatch() {

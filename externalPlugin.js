@@ -10,7 +10,7 @@ function transformImportSpecifiers(bodyItem, external) {
       codes.push(`const ${spec?.local?.value} = pkg;`);
     } else if (spec.type === 'ImportSpecifier') {
       codes.push(
-        `const {${spec?.imported ? `${spec?.imported?.value} : ${spec?.local?.value}` : spec?.local?.value}} = pkg;`
+        `const { ${spec?.imported ? `${spec?.imported?.value} : ${spec?.local?.value}` : spec?.local?.value} } = pkg;`
       );
     }
   }
@@ -32,7 +32,7 @@ module.exports = function externalPlugin(externals) {
         for (const i of body) {
           if (i.type === 'ImportDeclaration' && i.source.value in externals) {
             const text = contents.substring(i.span.start - span.start, i.span.end - span.start);
-            if (/^import[\s\w\d-_\{\}\n]+from[\s\'\"\w\d-_\/]+\;?/i) {
+            if (/^import[\s\w\d-_\{\}\n\,]+from[\s\'\"\w\d-_\/]+\;?/i.test(text)) {
               const code = transformImportSpecifiers(i, externals);
               contents = contents.replace(text, code);
             }

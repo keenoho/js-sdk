@@ -186,41 +186,10 @@ export class SDK extends EventEmitter {
     });
   }
 
-  // tool
-  uploadFile({ filePath, file }) {
+  // mine
+  mineInfo(params) {
     return this.request({
-      url: '/v1/file/token',
-      method: 'GET',
-      params: { filePath },
-    })
-      .then((res) => {
-        if (res?.code !== 0) {
-          throw res;
-        }
-        const token = res?.data;
-        if (!token) {
-          throw new Error('获取上传token失败');
-        }
-        return token;
-      })
-      .then((token) => {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('filePath', filePath);
-        formData.append('token', token);
-
-        return this.request({
-          url: '/v1/file/upload',
-          method: 'POST',
-          data: formData,
-        });
-      });
-  }
-
-  // user
-  userInfo(params) {
-    return this.request({
-      url: '/v1/user/info',
+      url: '/v1/mine/info',
       method: 'GET',
       params,
     });

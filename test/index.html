@@ -128,23 +128,23 @@
           });
       }
 
-      function fileChange(e) {
-        const now = new Date();
-        const targetFile = e.target.files[0];
-        const splitName = targetFile.name.split('.');
-        const ext = splitName[splitName.length - 1];
-        const filePath = `/some/path/${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}/${
-          Date.now() % 10000
-        }.${ext}`;
-        sdk
-          .uploadFile({
-            filePath,
-            file: targetFile,
-          })
-          .then((res) => {
-            console.log(res);
-          });
-      }
+      // function fileChange(e) {
+      //   const now = new Date();
+      //   const targetFile = e.target.files[0];
+      //   const splitName = targetFile.name.split('.');
+      //   const ext = splitName[splitName.length - 1];
+      //   const filePath = `/some/path/${now.getFullYear()}${now.getMonth() + 1}${now.getDate()}/${
+      //     Date.now() % 10000
+      //   }.${ext}`;
+      //   sdk
+      //     .uploadFile({
+      //       filePath,
+      //       file: targetFile,
+      //     })
+      //     .then((res) => {
+      //       console.log(res);
+      //     });
+      // }
 
       function userInfo() {
         sdk.userInfo().then((res) => {

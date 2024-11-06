@@ -186,10 +186,10 @@ export class SDK extends EventEmitter {
     });
   }
 
-  // mine
-  mineInfo(params) {
+  // user
+  userInfo(params) {
     return this.request({
-      url: '/v1/mine/info',
+      url: '/v1/user/info',
       method: 'GET',
       params,
     });

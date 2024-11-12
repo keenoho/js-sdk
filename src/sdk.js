@@ -12,14 +12,7 @@ export const sdkDefaultAxiosOptions = {
   method: 'GET',
 };
 
-export const sdkDefualtRequestOptions = {
-  showLoading: false,
-  handleLoadingFunc: undefined,
-  showError: false,
-  handleErrorFunc: undefined,
-  checkCode: true,
-  targetCode: 0,
-};
+export const sdkDefualtRequestOptions = {};
 
 export const sdkDefaultOptions = {
   autoRenewToken: true,

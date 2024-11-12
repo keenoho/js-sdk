@@ -9,8 +9,8 @@ export function generateSign(app, ttl, ts, randId) {
   return HmacSHA1(str, app.toString()).toString();
 }
 
-export function generateSignature(url, app, token) {
-  const str = `${app}:${url}`.split('').sort().join('');
+export function generateSignature(path, app, token) {
+  const str = `${app}:${path}`.split('').sort().join('');
   const res = HmacSHA1(str, token).toString();
   return res;
 }

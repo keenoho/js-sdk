@@ -44,17 +44,25 @@ export class SDK extends EventEmitter {
     localStorage.removeItem('keenoho_session_expired');
   }
 
-  constructor(config, sdkOption) {
+  constructor(config, sdkOption, data) {
     super();
     this.event;
     this.sdkOption = Object.assign({}, sdkDefaultOptions, sdkOption);
     this.config = Object.assign({}, loadConfig(), config);
     this.token = undefined;
     this.tokenExpired = undefined;
-    this.init();
+    this.init(data);
   }
 
-  async init() {
+  async init(data) {
+    if (data && data?.token && data?.tokenExpired) {
+      this.token = data?.token;
+      this.tokenExpired = data?.tokenExpired;
+      Promise.resolve().finally(() => {
+        this.emit('ready', this);
+      });
+      return;
+    }
     await this.initToken();
     this.emit('ready', this);
   }
